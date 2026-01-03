@@ -10,7 +10,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 
 # 3. 데이터베이스 (Community)
-from langchain_community.vectorstores import Chroma
+from langchain_community.vectorstores import FAISS
 
 # 4. 메모리 (가장 안전한 최신 경로로 변경)
 # 만약 여기서 에러가 나면 from langchain_community.chat_message_histories import ... 로 선회해야 합니다.
@@ -211,11 +211,17 @@ with st.sidebar:
                 model="models/embedding-001"
             )
 
-            st.session_state.vector_db = Chroma.from_documents(
-                documents=chunks,
-                embedding=embeddings,
-                persist_directory="./chroma_db"  # 선택: 재실행해도 유지됨
-)
+            # 수정 전 (에러 발생)
+            # st.session_state.vector_db = Chroma.from_documents(
+            #     documents=chunks,
+            #     embedding=embeddings,
+            #     persist_directory="./chroma_db"
+            # )
+
+            # 수정 후 (권장)
+            st.session_state.vector_db = FAISS.from_documents(
+                chunks, embedding=embeddings
+            )  
 
             st.success("학습 완료")
 
