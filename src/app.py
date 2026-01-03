@@ -10,7 +10,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 
 # 3. 데이터베이스 (Community)
-from langchain_community.vectorstores import FAISS  # Chroma 대신 FAISS가 있는지 확인
+from langchain_community.vectorstores import Chroma
 
 # 4. 메모리 (가장 안전한 최신 경로로 변경)
 # 만약 여기서 에러가 나면 from langchain_community.chat_message_histories import ... 로 선회해야 합니다.
@@ -35,7 +35,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("HUFS RAG 기반 AI 튜터")
+st.title("HUFS RAG 기반 AI 튜터(Gemini)")
 st.caption("강의 자료 기반으로 답변하며 출처를 명확히 제시합니다.")
 
 # --------------------------------
@@ -179,7 +179,6 @@ with st.sidebar:
 
     if st.button("대화 초기화"):
         st.session_state.messages = []
-        st.session_state.memory.clear()
         st.rerun()
 
     st.divider()
@@ -212,12 +211,10 @@ with st.sidebar:
                 model="models/embedding-001"
             )
 
-            # 기존 코드 (에러 발생)
-            # st.session_state.vector_db = Chroma.from_documents(...)
-
-            # 수정 코드
-            st.session_state.vector_db = FAISS.from_documents(
-                chunks, embedding=embeddings
+            st.session_state.vector_db = Chroma.from_documents(
+                documents=chunks,
+                embedding=embeddings,
+                persist_directory="./chroma_db"  # 선택: 재실행해도 유지됨
 )
 
             st.success("학습 완료")
